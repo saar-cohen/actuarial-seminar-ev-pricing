@@ -1,0 +1,24 @@
+# R packages required for the seminar pipeline (one per line).
+# Installed by: Rscript setup_environment.R
+
+# Data manipulation & I/O (tidyverse includes dplyr, ggplot2, tidyr, readr, purrr, stringr, forcats)
+tidyverse
+data.table
+lubridate
+
+# Visualisation & formatting
+scales
+patchwork
+knitr
+
+# Statistical testing & modelling
+broom
+car
+MASS
+statmod
+cplm
+sandwich
+lmtest
+
+# Jupyter R kernel (for notebooks/*.ipynb)
+IRkernel

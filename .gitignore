@@ -40,11 +40,25 @@ vignettes/*.pdf
 .Renviron
 .env
 
-# pkgdown site
-docs/
 
 # translation temp files
 po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# R history and workspace
+.Rhistory
+.RData
+.Rproj.user/
+
+# Temporary files and caches
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Large datasets or raw data (uncomment if needed)
+# data/raw/*.csv
+
+data/raw/*.csv
+data/processed/*.csv

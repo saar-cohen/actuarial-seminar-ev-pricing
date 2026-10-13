@@ -83,3 +83,9 @@ The GLMs compare **BEV with ICE directly**. Hybrids are removed, and ICE is the 
 - **Severity:** the GLM factor (1.16) is lower than the t-test ratio (1.29). The GLM models the mean cost on all ages with continuous value.
 - **Total loss:** a damaged BEV has about twice the odds of a write-off at equal value and age. These losses are already in the severity model, so the tariff gets no separate total-loss loading; that would double count.
 - **Tariff:** an own-damage BEV relativity of about **1.29** on top of the vehicle-value factor, with the third-party rate left at 1.00.
+
+Final tariff (own-damage part):
+
+$$\text{Premium} = \text{Base} \times f(\text{Vehicle Value}) \times f(\text{Vehicle Age}) \times f(\text{Driver Age}) \times \underbrace{\{1.00 \text{ ICE},\ 1.29 \text{ BEV}\}}_{\text{powertrain}} + \text{Expenses and Risk Margin}$$
+
+Our GLMs estimate only the risk part of this formula, the pure premium. Expenses and profit margin are company-specific loadings set outside the model and added on top to reach the commercial premium.

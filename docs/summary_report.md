@@ -1,6 +1,6 @@
 # BEV vs. ICE Motor Property Insurance: Interim Summary
 
-**Status:** data cleaning, join checks and statistical tests done. GLM pricing (notebook 04) is next.
+**Status:** data cleaning, join checks, statistical tests and pricing GLMs done.
 **Details:** `docs/data_quality_audit.md` (cleaning and join rules), `notebooks/03_statistical_tests.ipynb` (all test output).
 
 ---
@@ -68,14 +68,18 @@ Theft is left out of total loss, because a stolen car is written off whatever it
   - Vehicle value and age change the severity and total-loss estimates a lot.
   - Driver age changes nothing: driver profiles are almost the same for BEV and ICE.
 
-## 4. Next step
+## 4. Pricing GLMs (notebook 04)
 
-Notebook 04 fits the GLMs with all rating factors at once:
-- **Frequency:** Poisson or Negative Binomial with `offset(log(exposure))`.
-- **Severity:** Gamma with a log link and `log(Vehicle_Value)`.
-- **Total loss:** logistic GLM with theft handled separately.
+The GLMs compare **BEV with ICE directly**. Hybrids are removed, and ICE is the reference level (1.00). Each model controls for all rating factors at once: vehicle value (log), vehicle age, driver age (frequency) and district (severity).
 
-From the tests we expect:
-- a BEV frequency relativity close to 1.0;
-- a severity relativity of about 1.25–1.3 on top of value;
-- a non-theft total-loss effect that may be above 1 but needs the full model to confirm.
+| Model | BEV relativity (ICE = 1.00) | 95% CI | p |
+|---|---|---|---|
+| Frequency: Poisson, offset log(exposure) | 1.11 | 1.01–1.22 | 0.026 |
+| Own-damage severity: Gamma, log link | 1.16 | 1.02–1.32 | 0.022 |
+| Total loss: logistic, theft excluded (odds ratio) | 1.99 | 1.41–2.81 | < 0.001 |
+| **Own-damage pure premium = frequency × severity** | **1.29** | **1.10–1.52** | – |
+
+- **Frequency:** at equal value, BEVs claim about 11% more often. The crude tests did not show this, because more expensive cars have fewer claims.
+- **Severity:** the GLM factor (1.16) is lower than the t-test ratio (1.29). The GLM models the mean cost on all ages with continuous value.
+- **Total loss:** a damaged BEV has about twice the odds of a write-off at equal value and age. These losses are already in the severity model, so the tariff gets no separate total-loss loading; that would double count.
+- **Tariff:** an own-damage BEV relativity of about **1.29** on top of the vehicle-value factor, with the third-party rate left at 1.00.

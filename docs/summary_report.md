@@ -48,11 +48,11 @@ Comparing all BEVs with all ICE cars mixes powertrain with car age. ICE cars go 
 | **H1 Severity** (BEV/ICE cost ratio) | **1.98** (1.79–2.20), p < 0.001 | **1.62** (1.44–1.83), p < 0.001 | **1.29** (1.13–1.48), p < 0.001 |
 | **H2 Frequency** (rate ratio) | 1.05 (0.96–1.14), p = 0.29 | 1.06 (0.96–1.17), p = 0.25 | 1.07, p = 0.21 |
 | **H3 Total loss**, excluding theft | 8.6% vs 8.2%, p = 0.79 | 7.7% vs 5.7%, p = 0.11 | **OR 1.80** (1.18–2.74), p = 0.006 |
-| **Third-party damage** (BEV/ICE cost ratio) | 0.95 (0.84–1.07), p = 0.42 | 0.93 (0.81–1.08), p = 0.35 | – |
+| **Third-party damage** (BEV/ICE cost ratio) | 0.95 (0.84–1.08), p = 0.42 | 0.93 (0.81–1.08), p = 0.36 | – |
 
 Tests used:
 - **Frequency:** exact Poisson rate test.
-- **Severity:** Welch t-test on log cost, giving a ratio of geometric means; a Wilcoxon rank-sum test gives the same answers. With value tiers pooled, a log-cost regression with value tier.
+- **Severity (own damage and third party):** first an F-test for equal variances of log cost, which never rejects (p = 0.37–0.86). We then use the Two-Sample t-test on log cost, giving a ratio of geometric means. With value tiers pooled, we use a log-cost regression with value tier.
 - **Total loss:** two-proportion test; with value tiers pooled, a Cochran-Mantel-Haenszel test. The tiers are too small to test one by one.
 
 Theft is left out of total loss, because a stolen car is written off whatever its powertrain.

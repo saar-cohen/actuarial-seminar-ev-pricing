@@ -8,11 +8,9 @@
 #           data/processed/cleaning_log.csv   (rows in/out per step)
 # Run     : Rscript src/01_clean_datasets.R      (from the repository root)
 #
-# Rules follow docs/data_quality_audit.md. Philosophy: deterministic fixes for
-# recoverable issues; drop rows that are ambiguous or unrecoverable when they
-# are a negligible share of the portfolio. Every step is logged.
-# The policy-claim join (orphans, in-period checks, damage-to-value screens)
-# is left to src/01_etl_merge_and_clean.R.
+# Rules come from docs/data_quality_audit.md: fix what can be fixed, drop the
+# few rows that can't, and log every step.
+# The policy-claim join is left to src/01_etl_merge_and_clean.R.
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -129,18 +127,23 @@ log_step("policies", "standardise District", "fix", nrow(pol), nrow(pol), n_dist
 
 # Gender: code/case/space variants (P3); N/A, U, blank -> Unknown (P4).
 g0  <- pol$Gender
-pol <- mutate(pol, Gender = case_match(str_to_lower(str_trim(Gender)),
-                                       c("m", "male")   ~ "Male",
-                                       c("f", "female") ~ "Female",
-                                       .default = "Unknown"))
+pol <- mutate(pol, g = str_to_lower(str_trim(Gender)),
+                   Gender = case_when(g %in% c("m", "male")   ~ "Male",
+                                      g %in% c("f", "female") ~ "Female",
+                                      .default = "Unknown")) |>
+  select(-g)
 log_step("policies", "standardise Gender", "fix", nrow(pol), nrow(pol), sum(g0 != pol$Gender))
 
 # Fuel_Detail: electric synonyms -> BEV, typo Diesal -> Diesel (P6).
 f0  <- pol$Fuel_Detail
-pol <- mutate(pol, Fuel_Detail = case_match(str_to_upper(str_trim(Fuel_Detail)),
-                                            c("BEV", "EV", "ELECTRIC") ~ "BEV",
-                                            c("DIESEL", "DIESAL")      ~ "Diesel",
-                                            "PETROL" ~ "Petrol", "HEV" ~ "HEV", "PHEV" ~ "PHEV"))
+pol <- mutate(pol, f = str_to_upper(str_trim(Fuel_Detail)),
+                   Fuel_Detail = case_when(f %in% c("BEV", "EV", "ELECTRIC") ~ "BEV",
+                                           f %in% c("DIESEL", "DIESAL")      ~ "Diesel",
+                                           f == "PETROL" ~ "Petrol",
+                                           f == "HEV"    ~ "HEV",
+                                           f == "PHEV"   ~ "PHEV")) |>
+  select(-f)
+stopifnot(!anyNA(pol$Fuel_Detail))                                     # no unmapped label left
 log_step("policies", "standardise Fuel_Detail", "fix", nrow(pol), nrow(pol), sum(f0 != pol$Fuel_Detail))
 
 # Powertrain: trailing space "Hybrid " (P5).
@@ -204,12 +207,16 @@ log_step("policies", "parse Premium text", "fix", nrow(pol), nrow(pol), n_txt)
 bad_prem <- pol$Premium <= 0 & !is.na(pol$Premium)
 pol <- mutate(pol, Premium = if_else(bad_prem, NA_real_, Premium))
 log_step("policies", "Premium <= 0 -> NA", "fix", nrow(pol), nrow(pol), sum(bad_prem))
+# Premium < 300 (P20) is left as is: those rows are short periods priced pro rata.
+# Vehicle_Age 28 (P13, a likely top-code) is left for banding (20+).
 
 # ---- A6. Final layout ----------------------------------------------------------
 policies_cleaned <- pol |>
   select(Policy_ID, Start_Date, End_Date, exposure, District, Gender, Driver_Age,
          License_Tenure, Powertrain, Fuel_Detail, Vehicle_Age, Vehicle_Value, Premium)
-stopifnot(!anyDuplicated(policies_cleaned$Policy_ID))
+stopifnot(!anyDuplicated(policies_cleaned$Policy_ID),
+          !anyNA(policies_cleaned$Powertrain),
+          all(policies_cleaned$exposure > 0 & policies_cleaned$exposure <= 1.01))
 
 # =============================================================================
 # PART B: CLAIMS
@@ -237,9 +244,8 @@ log_step("claims", "B3 parse Accident_Date", "fix", nrow(clm), nrow(clm), 0)
 
 # ---- B4a. Amounts: text -> numeric (C4) -------------------------------------------
 # "₪7,815" / "22,563.05" text and float artefacts (1018120.0000000001) -> 2 dp.
-n_fix <- clm |>
-  summarise(n = sum(str_detect(Own_Damage_Amount, "[₪,\\s]")) +
-                sum(str_detect(TP_Damage_Amount,  "[₪,\\s]"))) |> pull(n)
+n_fix <- sum(str_detect(clm$Own_Damage_Amount, "[₪,\\s]") |
+             str_detect(clm$TP_Damage_Amount,  "[₪,\\s]"))           # rows, not cells
 clm <- clm |>
   mutate(across(c(Own_Damage_Amount, TP_Damage_Amount), ~ round(to_num(.x), 2)))
 stopifnot(!anyNA(clm$Own_Damage_Amount))                    # OD is never blank
@@ -302,6 +308,9 @@ log_step("claims", "B6b total-loss flag reset (OD = 0)", "flag", nrow(clm), nrow
 claims_cleaned <- clm |>
   select(Claim_ID, Policy_ID, Accident_Date, Claim_Type, Own_Damage_Amount,
          TP_Damage_Amount, Is_Total_Loss, is_total_loss_clean, is_cat_event)
+stopifnot(!anyNA(claims_cleaned), all(claims_cleaned$TP_Damage_Amount >= 0))
+# Left as is: OD = 250 (C9, 12 rows) and Theft with TP > 0 (C14, 20 rows) do not
+# change the own-damage study; same-day claims on one policy (C16) look genuine.
 
 # =============================================================================
 # EXPORT

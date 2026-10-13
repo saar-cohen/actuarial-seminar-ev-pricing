@@ -1,19 +1,17 @@
 # Actuarial Analysis & Pricing: BEV vs. ICE Motor Property Insurance
 
-## Executive Overview
+## Overview
 
-This seminar project investigates whether battery electric vehicles (BEVs) carry a
-different motor property-damage risk profile than internal combustion engine (ICE)
-vehicles, and what that means for pricing. Using policy-level exposure data and
-claim-level loss data, the research aims to:
+This seminar project asks whether battery electric vehicles (BEVs) have a different
+motor property-damage risk than internal combustion engine (ICE) vehicles, and what
+that means for pricing. Using policy-level exposure data and claim-level loss data, we:
 
-1. **Quantify claim frequency** (claims per policy-year) for BEV vs. ICE.
-2. **Quantify claim severity** (own damage and third-party property damage) and
-   **total-loss propensity**.
-3. **Test statistically** whether observed differences are significant, after
-   controlling for confounders such as vehicle age, vehicle value and driver profile.
-4. **Estimate a pricing relativity** for Powertrain within an actuarial two-part
-   frequency-severity GLM framework, and derive underwriting / tariff recommendations.
+1. **Measure claim frequency** (claims per vehicle-year) for BEV vs. ICE.
+2. **Measure claim severity** (own-damage cost per claim) and the **total-loss rate**.
+3. **Test** whether the differences are statistically significant, before and after
+   controlling for vehicle value, vehicle age and driver age.
+4. **Estimate a BEV pricing relativity** with a frequency-severity GLM and turn it
+   into tariff recommendations.
 
 ## Repository Structure
 
@@ -23,15 +21,19 @@ actuarial-seminar-ev-pricing/
 │   ├── raw/                          # Original source extracts (read-only)
 │   │   ├── policies_raw.csv
 │   │   └── claims_raw.csv
-│   └── processed/                    # Cleaned & joined datasets produced by ETL
+│   └── processed/                    # Cleaned files written by src/ (not in git)
 ├── src/
-│   └── 01_etl_merge_and_clean.R      # Load, join, clean, engineer features, export
+│   ├── 01_clean_datasets.R           # Cleans policies and claims, writes data/processed/
+│   ├── 01_etl_merge_and_clean.R      # Planned: policy-claim join
+│   └── 02_verify_join.R              # Checks keys, many-to-one join, orphans, dates
 ├── notebooks/
 │   ├── 01_eda_policies.ipynb         # Portfolio / exposure EDA
 │   ├── 02_eda_claims.ipynb           # Frequency, severity, total-loss EDA
 │   ├── 03_statistical_tests.ipynb    # BEV vs. ICE hypothesis testing
 │   └── 04_pricing_glm_models.ipynb   # Frequency-severity GLMs & pricing
-├── docs/                             # Proposal, status reports, guidelines, notes
+├── docs/
+│   ├── data_quality_audit.md         # Every data issue found and how we handle it
+│   └── summary_report.md             # Interim summary: cleaning, join, test results
 ├── r_requirements.txt                # R package list
 ├── setup_environment.R               # One-command R dependency installer
 ├── .gitignore
@@ -40,7 +42,7 @@ actuarial-seminar-ev-pricing/
 
 ## Workflow
 
-The analysis follows a linear pipeline; each stage consumes the outputs of the previous one.
+Each step uses the output of the one before it.
 
 ```
 Raw data ──► ETL ──► EDA ──► Statistical Testing ──► Actuarial GLM Pricing
@@ -49,9 +51,9 @@ Raw data ──► ETL ──► EDA ──► Statistical Testing ──► Act
 | Step | File | What it does |
 |------|------|--------------|
 | 1. Raw data | `data/raw/` | Untouched policy and claim extracts. |
-| 2. ETL | `src/01_etl_merge_and_clean.R` | Joins on `Policy_ID`, removes duplicates, handles missing values, parses dates and computes exposure, harmonises labels, isolates property claims, engineers rating factors, writes to `data/processed/`. |
-| 3. EDA | `notebooks/01_eda_policies.ipynb`, `notebooks/02_eda_claims.ipynb` | Describes the portfolio and loss experience; identifies confounders and data issues. |
-| 4. Statistical testing | `notebooks/03_statistical_tests.ipynb` | t-tests / Wilcoxon for severity, chi-square for frequency and total loss, stratified subgroup analysis. |
+| 2. Cleaning | `src/01_clean_datasets.R` | Removes duplicates, parses dates and amounts, computes exposure, fixes labels and placeholders, and writes `policies_cleaned` and `claims_cleaned` to `data/processed/`. The rules are in `docs/data_quality_audit.md`. |
+| 3. EDA | `notebooks/01_eda_policies.ipynb`, `notebooks/02_eda_claims.ipynb` | Describes the portfolio and the claims, and finds the confounders (vehicle value and age). |
+| 4. Statistical testing | `notebooks/03_statistical_tests.ipynb` | Tests hypotheses H1–H4: Wilcoxon and Welch for severity, Poisson and chi-square for frequency, proportion and Fisher tests for total loss, and CMH tests controlling for value and age. |
 | 5. GLM pricing | `notebooks/04_pricing_glm_models.ipynb` | Poisson / Negative Binomial frequency model with exposure offset, Gamma / Inverse-Gaussian severity model, pure premium and BEV relativity, tariff implications. |
 
 ## Prerequisites / Getting Started
@@ -70,5 +72,5 @@ Raw data ──► ETL ──► EDA ──► Statistical Testing ──► Act
    ```
    Then in VS Code: *Select Kernel → Select Another Kernel... → Jupyter Kernel... → R*.
    Note: if you write `kernel.json` by hand, save it as UTF-8 **without BOM**. VS Code cannot read the file if it starts with a BOM.
-4. Run `src/01_etl_merge_and_clean.R` to generate `data/processed/`.
+4. Run `Rscript src/01_clean_datasets.R` from the repository root to create `data/processed/`, then `Rscript src/02_verify_join.R` to check the join.
 5. Run the notebooks in `notebooks/` in numerical order.

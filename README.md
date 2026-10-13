@@ -53,7 +53,7 @@ Raw data ──► ETL ──► EDA ──► Statistical Testing ──► Act
 | 1. Raw data | `data/raw/` | Untouched policy and claim extracts. |
 | 2. Cleaning | `src/01_clean_datasets.R` | Removes duplicates, parses dates and amounts, computes exposure, fixes labels and placeholders, and writes `policies_cleaned` and `claims_cleaned` to `data/processed/`. The rules are in `docs/data_quality_audit.md`. |
 | 3. EDA | `notebooks/01_eda_policies.ipynb`, `notebooks/02_eda_claims.ipynb` | Describes the portfolio and the claims, and finds the confounders (vehicle value and age). |
-| 4. Statistical testing | `notebooks/03_statistical_tests.ipynb` | Tests hypotheses H1–H4: Wilcoxon and Welch for severity, Poisson and chi-square for frequency, proportion and Fisher tests for total loss, and CMH tests controlling for value and age. |
+| 4. Statistical testing | `notebooks/03_statistical_tests.ipynb` | Four formal H0/H1 tests, BEV vs. ICE: Poisson rate test (frequency), Welch t-test on log cost (own-damage and third-party severity), two-proportion test (total loss). Each is repeated on all ages, on cars aged ≤ 5, and within value tiers. |
 | 5. GLM pricing | `notebooks/04_pricing_glm_models.ipynb` | Poisson / Negative Binomial frequency model with exposure offset, Gamma / Inverse-Gaussian severity model, pure premium and BEV relativity, tariff implications. |
 
 ## Prerequisites / Getting Started

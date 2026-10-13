@@ -47,17 +47,23 @@ Comparing all BEVs with all ICE cars mixes powertrain with car age. ICE cars go 
 |---|---|---|---|
 | **H1 Severity** (BEV/ICE cost ratio) | **1.98** (1.79–2.20), p < 0.001 | **1.62** (1.44–1.83), p < 0.001 | **1.29** (1.13–1.48), p < 0.001 |
 | **H2 Frequency** (rate ratio) | 1.05 (0.96–1.14), p = 0.29 | 1.06 (0.96–1.17), p = 0.25 | 1.07, p = 0.21 |
-| **H3 Total loss**, all claims (odds ratio) | 0.82 (0.60–1.11), p = 0.22 | 0.99, p = 1.00 | 1.21, p = 0.37 |
-| **H3 Total loss**, excluding theft (odds ratio) | 1.05 (0.76–1.43), p = 0.75 | 1.40, p = 0.10 | **1.80** (1.18–2.74), p = 0.006 (Holm p ≈ 0.08) |
+| **H3 Total loss**, excluding theft | 8.6% vs 8.2%, p = 0.79 | 7.7% vs 5.7%, p = 0.11 | **OR 1.80** (1.18–2.74), p = 0.006 |
+| **Third-party damage** (BEV/ICE cost ratio) | 0.95 (0.84–1.07), p = 0.42 | 0.93 (0.81–1.08), p = 0.35 | – |
 
-Cost ratios are ratios of geometric means from a Welch t-test on log cost. A Wilcoxon rank-sum test gives the same answers.
+Tests used:
+- **Frequency:** exact Poisson rate test.
+- **Severity:** Welch t-test on log cost, giving a ratio of geometric means; a Wilcoxon rank-sum test gives the same answers. With value tiers pooled, a log-cost regression with value tier.
+- **Total loss:** two-proportion test; with value tiers pooled, a Cochran-Mantel-Haenszel test. The tiers are too small to test one by one.
+
+Theft is left out of total loss, because a stolen car is written off whatever its powertrain.
 
 **What this means**
 - **H1 (severity) holds, but most of the gap is vehicle value.** A BEV claim costs about 2× an ICE claim overall. At the same age and similar value the gap is about 1.3×, and a regression on `log(Vehicle_Value)` gives 1.25×. The premium is largest for cheaper BEVs (≈ 1.95× in the low tier) and not significant in the top tier (1.10×).
-- **H2 (frequency) holds.** BEVs do not claim more often, overall or at equal age and value. The confidence interval rules out a BEV excess above about 14–17%.
+- **H2 (frequency) holds.** BEVs do not claim more often, overall, at equal age, or within any value tier (rate ratios 0.90–1.13). The confidence intervals rule out a BEV excess much above 15%.
 - **H3 (total loss) is not supported in the main tests.**
-  - The crude result even goes the other way, because theft write-offs are more common for ICE cars.
-  - Removing theft and holding age and value fixed, BEV odds of a write-off are about 1.8×. That fits the battery-damage argument, but it rests on few BEV total losses and is not significant after the Holm correction across all 19 tests.
+  - Including theft, BEVs are even written off less often (9.0% vs 10.7%), because ICE cars are stolen more often.
+  - Without theft, but holding age and value fixed, BEV odds of a write-off are about 1.8×. That fits the battery-damage argument, and it stays significant after a Holm correction over the 8 main tests (p_holm = 0.03). It rests on few cases, though: the low value tier has only 7 BEV total losses out of 37 claims.
+- **Third-party damage shows no difference.** In collisions with another vehicle, the damage a BEV causes to the other car is about the same as for an ICE car (ratio 0.95, p = 0.42). The extra battery weight does not show up in third-party payouts.
 - **H4 (confounding) holds.**
   - Vehicle value and age change the severity and total-loss estimates a lot.
   - Driver age changes nothing: driver profiles are almost the same for BEV and ICE.

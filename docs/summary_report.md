@@ -70,11 +70,11 @@ Theft is left out of total loss, because a stolen car is written off whatever it
 
 ## 4. Pricing GLMs (notebook 04)
 
-The GLMs compare **BEV with ICE directly**. Hybrids are removed, and ICE is the reference level (1.00). Each model controls for all rating factors at once: vehicle value (log), vehicle age, driver age (frequency) and district (severity).
+The GLMs compare **BEV with ICE directly**. Hybrids are removed, and ICE is the reference level (1.00). Each model controls for all rating factors at once: vehicle value (log), vehicle age, driver age (frequency) and district (frequency and severity).
 
 | Model | BEV relativity (ICE = 1.00) | 95% CI | p |
 |---|---|---|---|
-| Frequency: Poisson, offset log(exposure) | 1.11 | 1.01–1.22 | 0.026 |
+| Frequency: Poisson, offset log(exposure) | 1.11 | 1.01–1.23 | 0.025 |
 | Own-damage severity: Gamma, log link | 1.16 | 1.02–1.32 | 0.022 |
 | Total loss: logistic, theft excluded (odds ratio) | 1.99 | 1.41–2.81 | < 0.001 |
 | **Own-damage pure premium = frequency × severity** | **1.29** | **1.10–1.52** | – |
@@ -86,6 +86,6 @@ The GLMs compare **BEV with ICE directly**. Hybrids are removed, and ICE is the 
 
 Final tariff (own-damage part):
 
-$$\text{Premium} = \text{Base} \times f(\text{Vehicle Value}) \times f(\text{Vehicle Age}) \times f(\text{Driver Age}) \times \underbrace{\{1.00 \text{ ICE},\ 1.29 \text{ BEV}\}}_{\text{powertrain}} + \text{Expenses and Risk Margin}$$
+$$\text{Premium} = \text{Base} \times f(\text{Vehicle Value}) \times f(\text{Vehicle Age}) \times f(\text{Driver Age}) \times f(\text{District}) \times \underbrace{\{1.00 \text{ ICE},\ 1.29 \text{ BEV}\}}_{\text{powertrain}} + \text{Expenses and Risk Margin}$$
 
 Our GLMs estimate only the risk part of this formula, the pure premium. Expenses and profit margin are company-specific loadings set outside the model and added on top to reach the commercial premium.

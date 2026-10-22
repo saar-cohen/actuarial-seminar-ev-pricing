@@ -3,6 +3,7 @@
 # -----------------------------------------------------------------------------
 # Purpose : Clean the raw policy and claim extracts SEPARATELY (no join yet).
 # Inputs  : data/raw/policies_raw.csv, data/raw/claims_raw.csv
+#           (synthetic data provided by the seminar supervisors, Anat Elad and Irena Veyro)
 # Outputs : data/processed/policies_cleaned.{rds,csv}
 #           data/processed/claims_cleaned.{rds,csv}
 #           data/processed/cleaning_log.csv   (rows in/out per step)

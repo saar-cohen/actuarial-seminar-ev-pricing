@@ -13,6 +13,9 @@ that means for pricing. Using policy-level exposure data and claim-level loss da
 4. **Estimate a BEV pricing relativity** with a frequency-severity GLM and turn it
    into tariff recommendations.
 
+**Data source:** the dataset is synthetic. It was provided by the seminar supervisors,
+Anat Elad and Irena Veyro, as two raw extracts (`policies_raw.csv`, `claims_raw.csv`).
+
 ## Repository Structure
 
 ```

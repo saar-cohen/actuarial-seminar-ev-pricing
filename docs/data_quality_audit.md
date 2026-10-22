@@ -1,6 +1,6 @@
 # Data Quality Audit
 
-**Files:** `data/raw/policies_raw.csv` (38,592 rows, 12 columns) and `data/raw/claims_raw.csv` (6,664 rows, 7 columns).
+**Files:** `data/raw/policies_raw.csv` (38,592 rows, 12 columns) and `data/raw/claims_raw.csv` (6,664 rows, 7 columns). A synthetic dataset provided by the seminar supervisors, Anat Elad and Irena Veyro.
 **Cleaning script:** `src/01_clean_datasets.R` → `data/processed/policies_cleaned` (38,309 rows), `claims_cleaned` (6,569 rows), `cleaning_log.csv`.
 **Updated:** 2026-10-13. Every row count below is the count the script logs (after exact duplicates are removed), unless marked "raw".
 
